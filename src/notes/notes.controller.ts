@@ -1,46 +1,68 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common';
 import { NotesService } from './notes.service';
+import { GetNotesDto, getNotesSchema } from './Pipes/ZodSchemas/getNotes.zod';
+import { ValidationPipe } from './Pipes/Validation.pipe';
+import { SearchNotesPipe } from './Pipes/SearchNotes.pipe';
+import {
+  SearchNotesDto,
+  searchNotesSchema,
+} from './Pipes/ZodSchemas/searchNotes.zod';
+import { GetNoteDto, getNoteSchema } from './Pipes/ZodSchemas/getNote.zod';
+import {
+  GetNotesByTitleDto,
+  getNotesByTitleSchema,
+} from './Pipes/ZodSchemas/getNotesByTitle.zod';
+import { GetNoteByTitlePipe } from './Pipes/GetNotesByTitle.pipe';
+import { PostNoteDto, postNoteSchema } from './Pipes/ZodSchemas/postNote.zod';
+import { PostNotePipe } from './Pipes/PostNote.pipe';
 
-@Controller("notes")
+@Controller('notes')
 export class NotesController {
-    constructor(private readonly notesService: NotesService){}
+  constructor(private readonly notesService: NotesService) {}
 
-    @Post("/getNotes")
-    async getNotes(@Body() body : any){
-        let postPerPage = body.postPerPage;
-        let page = body.page;
+  @Get('/countNotes')
+  async countNotes() {
+    return this.notesService.countNotes();
+  }
 
-        console.log(body, postPerPage, page);
-        
-        return this.notesService.getNotes(postPerPage, page);
-    }
-    
-    @Post("/getNote")
-    async getNote(@Body() body:any){
-        let noteId = body.noteId;
-        return this.notesService.getNote(noteId);
-    }
+  @Post('/getNotes')
+  @UsePipes(new ValidationPipe(getNotesSchema))
+  async getNotes(@Body() body: GetNotesDto) {
+    let { postPerPage, page } = body;
+    return this.notesService.getNotes(postPerPage, page);
+  }
 
-    @Post("/getNoteByTitle")
-    async getNoteByTitle(@Body() body:any){
-        let title = body.title;
+  @Post('/searchNotes')
+  @UsePipes(new ValidationPipe(searchNotesSchema), new SearchNotesPipe())
+  async searchNotes(@Body() body: SearchNotesDto) {
+    const { search } = body;
+    return this.notesService.searchNotes(search);
+  }
 
-        return this.notesService.getNoteByTitle(title);
-    }
+  @Post('/getNote')
+  @UsePipes(new ValidationPipe(getNoteSchema))
+  async getNote(@Body() body: GetNoteDto) {
+    let { noteId } = body;
+    return this.notesService.getNote(noteId);
+  }
 
-    @Post("/getNoteByTags")
-    async getNoteByTags(){
-        return this.notesService.getNotesByTags([]);
-    }
-    
+  @Post('/getNoteByTitle')
+  @UsePipes(new ValidationPipe(getNotesByTitleSchema), new GetNoteByTitlePipe())
+  async getNoteByTitle(@Body() body: GetNotesByTitleDto) {
+    let { title } = body;
+    return this.notesService.getNoteByTitle(title);
+  }
 
-    @Post("/postNote")
-    async postNote(@Body() body : any){
-            const title = body.title;
-            const note = body.note;
-            const author = body.author;
-            const tags = body.tags;
-        return this.notesService.postNote(title, note, author, tags);
-    }
-    
+  @Post('/getNoteByTags')
+  async getNoteByTags() {
+    return this.notesService.getNotesByTags([]);
+  }
+
+  @Post('/postNote')
+  @UsePipes(new ValidationPipe(postNoteSchema), new PostNotePipe())
+  async postNote(@Body() body: PostNoteDto) {
+    console.log('Creando nueva nota');
+    const { title, note, author } = body;
+    return this.notesService.postNote(title, note, author);
+  }
 }
