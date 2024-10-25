@@ -72,9 +72,10 @@ export class NotesService {
   }
 
   async postNote(title: string, note: string, author: string) {
-    const noteOverview = note
+    let noteOverview = note
       .replace(/<[^>]*>/g, '')
       .slice(this.noteOverviewShort.start, this.noteOverviewShort.end);
+    if (noteOverview === '') noteOverview = '(Sin vista previa)';
 
     const id = await this.noteModel.countDocuments({});
     const Note = { id, title, note, noteOverview, author };

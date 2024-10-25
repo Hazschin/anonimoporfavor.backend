@@ -10,12 +10,12 @@ export class ValidationPipe implements PipeTransform {
 
   transform(value: any, metadata: ArgumentMetadata) {
     try {
-      console.log('Usando Pipes', value);
+      //console.log('Usando Pipes', value);
       const parsedValue = this.schema.parse(value);
-      console.log('Usando Pipes', value);
+      //console.log('Usando Pipes', value);
       return parsedValue;
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       throw new BadRequestException('Validation failed');
     }
   }

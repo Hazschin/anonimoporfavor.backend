@@ -17,7 +17,7 @@ export class Note {
   @Prop({ required: true })
   note: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: '' })
   noteOverview: string;
 
   @Prop({ default: [] })
