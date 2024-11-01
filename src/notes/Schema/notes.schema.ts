@@ -17,7 +17,7 @@ export class Note {
   @Prop({ required: true })
   note: string;
 
-  @Prop({ required: true, default: '' })
+  @Prop({ required: true, default: '', minlength: 0, maxlength: 100 })
   noteOverview: string;
 
   @Prop({ default: [] })
