@@ -41,7 +41,7 @@ export class NotesService {
       .select('id title author note');
   }
 
-  searchNotes(search: string) {
+  searchNotes(search: string, postPerPage: number = 10, page: number = 1) {
     return this.noteModel
       .find({
         $and: [
@@ -49,13 +49,29 @@ export class NotesService {
           {
             $or: [
               { title: { $regex: search, $options: 'i' } },
-              //{ noteOverview: { $regex: search, $options: 'i' } },
+              { noteOverview: { $regex: search, $options: 'i' } },
             ],
           },
         ],
       })
       .sort({ _id: -1 })
+      .skip(--page * postPerPage)
+      .limit(postPerPage)
       .select('id title author noteOverview');
+  }
+
+  countSearchNotes(search: string, postPerPage: number = 10, page: number = 1) {
+    return this.noteModel.countDocuments({
+      $and: [
+        { ...this.findMinParams },
+        {
+          $or: [
+            { title: { $regex: search, $options: 'i' } },
+            { noteOverview: { $regex: search, $options: 'i' } },
+          ],
+        },
+      ],
+    });
   }
 
   getNoteByTitle(title: string = '') {

@@ -3,6 +3,8 @@ import { z } from 'zod';
 export const searchNotesSchema = z
   .object({
     search: z.string(),
+    postPerPage: z.number(),
+    page: z.number(),
   })
   .required();
 

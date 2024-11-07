@@ -35,8 +35,29 @@ export class NotesController {
   @Post('/searchNotes')
   @UsePipes(new ValidationPipe(searchNotesSchema), new SearchNotesPipe())
   async searchNotes(@Body() body: SearchNotesDto) {
-    const { search } = body;
-    return this.notesService.searchNotes(search);
+    const { search, postPerPage, page } = body;
+    return this.notesService.searchNotes(search, postPerPage, page);
+  }
+
+  /*@Post('/countNotes')
+  @UsePipes(new ValidationPipe(searchNotesSchema), new SearchNotesPipe())
+  async searchNotes(@Body() body: SearchNotesDto) {
+    const { search, postPerPage, page } = body;
+    return this.notesService.searchNotes(search, postPerPage, page);
+  }*/
+
+  @Post('/searchAndCountNotes')
+  @UsePipes(new ValidationPipe(searchNotesSchema), new SearchNotesPipe())
+  async searchNotesBy(@Body() body: SearchNotesDto) {
+    const { search, postPerPage, page } = body;
+    return {
+      notes: await this.notesService.searchNotes(search, postPerPage, page),
+      qNotes: await this.notesService.countSearchNotes(
+        search,
+        postPerPage,
+        page,
+      ),
+    };
   }
 
   @Post('/getNote')
